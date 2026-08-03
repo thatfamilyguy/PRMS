@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Outer Decorative Shield Canvas -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M60,10 C80,10 95,18 95,18 C95,18 98,68 60,105 C22,68 25,18 25,18 C25,18 40,10 60,10 Z" />
+    
+    <!-- Designated Empty Placeholder Space For Custom Splash Image -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M38,38 h44 v44 h-44 Z" />
+    
+    <!-- Subtle Placeholder Border & Cross Symbol -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M56,46 h8 v10 h10 v8 h-10 v10 h-8 v-10 h-10 v-8 h10 Z" />
+</vector>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PRMSMedical" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- High-Speed Splash Screen Theme (API 26+ compatible via androidx.core:core-splashscreen) -->
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#0F172A</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_placeholder</item>
+        <item name="postSplashScreenTheme">@style/Theme.PRMSMedical</item>
+    </style>
+</resources>
