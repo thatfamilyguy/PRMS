@@ -1,5 +1,6 @@
 package com.example.ui.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -14,15 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentActivity
+import com.example.R
 import com.example.data.model.User
 import com.example.data.model.UserRole
 import com.example.ui.theme.*
@@ -36,21 +37,16 @@ fun LoginScreen(
     onLoginSuccess: (User) -> Unit
 ) {
     val uiState by authViewModel.uiState.collectAsState()
-    val isBiometricAvailable by authViewModel.isBiometricAvailable.collectAsState()
-    val context = LocalContext.current
 
-    var username by remember(selectedRole) {
-        mutableStateOf(
-            when (selectedRole) {
-                UserRole.ADMIN -> "admin"
-                UserRole.MANAGER -> "manager"
-                UserRole.NURSE -> "nurse"
-                null -> ""
-            }
-        )
-    }
-    var password by remember { mutableStateOf("") }
+    var username by remember(selectedRole) { mutableStateOf("") }
+    var password by remember(selectedRole) { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+
+    // Password Rotation Form State
+    var currentPasswordAttempt by remember { mutableStateOf("") }
+    var newPasswordInput by remember { mutableStateOf("") }
+    var confirmPasswordInput by remember { mutableStateOf("") }
+    var rotationErrorMsg by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(uiState) {
         if (uiState is AuthUiState.Success) {
@@ -70,43 +66,33 @@ fun LoginScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             
-            /* ========================================================= */
-            /* SPACE DESIGNATED FOR CUSTOM SPLASH / BRAND IMAGE INSERTION */
-            /* ========================================================= */
             Surface(
                 modifier = Modifier
-                    .size(96.dp)
-                    .padding(bottom = 12.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = BentoContainerPurple,
-                border = androidx.compose.foundation.BorderStroke(1.dp, BentoAccentLight)
+                    .size(110.dp)
+                    .padding(bottom = 8.dp),
+                shape = RoundedCornerShape(28.dp),
+                color = BentoPrimary.copy(alpha = 0.12f),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, BentoPrimary.copy(alpha = 0.3f))
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.LocalHospital,
-                        contentDescription = "Medical System Logo Placeholder",
-                        tint = BentoPrimary,
-                        modifier = Modifier.size(48.dp)
+                    Image(
+                        painter = painterResource(id = R.drawable.health_ledger_emblem),
+                        contentDescription = "Health Ledger Emblem",
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
-            Text(
-                text = "[ Insert Splash / Brand Image Here ]",
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = BentoTextSecondary,
-                    fontSize = 11.sp
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "PRMS Medical",
+                text = "Health Ledger",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.ExtraBold,
                     color = BentoTextPrimary,
@@ -120,34 +106,49 @@ fun LoginScreen(
                 )
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Security Badge Pill
-            Surface(
-                color = BentoContainerSecondary,
-                shape = RoundedCornerShape(20.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, BentoBorder)
+            // Security Policy & Auto-Lock Instruction Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("security_instruction_banner"),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = BentoContainerPurple.copy(alpha = 0.5f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, BentoAccentLight)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier.padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "SQLCipher Security",
-                        tint = BentoPrimary,
-                        modifier = Modifier.size(14.dp)
+                        imageVector = Icons.Default.Shield,
+                        contentDescription = "Security Policy",
+                        tint = BentoPrimaryDark,
+                        modifier = Modifier.size(22.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "SQLCipher 256-bit AES • AndroidX Biometrics",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = BentoTextPrimary,
-                            fontSize = 11.sp
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = "REQUIRED SECURITY POLICY",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = BentoPrimaryDark
+                            )
                         )
-                    )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Always enter your password when re-opening the app after closing without logging out and whenever your phone locks.",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = BentoTextSecondary,
+                                fontSize = 11.5.sp
+                            )
+                        )
+                    }
                 }
             }
+
+
 
             if (selectedRole != null) {
                 Spacer(modifier = Modifier.height(10.dp))
@@ -199,6 +200,8 @@ fun LoginScreen(
                 }
             }
 
+
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // Login Form Card
@@ -216,7 +219,7 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "RBAC System Access",
+                        text = "System Access",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = BentoTextPrimary
@@ -325,43 +328,119 @@ fun LoginScreen(
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Icon(Icons.Default.Shield, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.LockOpen, contentDescription = null, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Secure Authenticate",
+                                text = "Login",
                                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Biometric Button
-                    OutlinedButton(
-                        onClick = {
-                            if (context is FragmentActivity) {
-                                authViewModel.triggerBiometricAuth(context, if (username.isNotBlank()) username else "admin")
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .testTag("biometric_button"),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = BentoPrimary),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, BentoBorder)
-                    ) {
-                        Icon(Icons.Default.Fingerprint, contentDescription = "Biometric Auth", modifier = Modifier.size(22.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Fingerprint / Face Unlock",
-                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
-                        )
-                    }
                 }
             }
-
         }
+    }
+
+    // MANDATORY WEEKLY PASSWORD CHANGE DIALOG
+    if (uiState is AuthUiState.PasswordExpired) {
+        val expiredState = uiState as AuthUiState.PasswordExpired
+
+        AlertDialog(
+            onDismissRequest = { authViewModel.resetState() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.LockReset,
+                    contentDescription = "Password Expired",
+                    tint = BentoWarning,
+                    modifier = Modifier.size(36.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "Weekly Password Rotation Required",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = expiredState.reason,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = BentoTextSecondary)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (rotationErrorMsg != null) {
+                        Text(
+                            text = rotationErrorMsg!!,
+                            style = MaterialTheme.typography.labelSmall.copy(color = BentoAlert),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = currentPasswordAttempt.ifEmpty { password },
+                        onValueChange = { currentPasswordAttempt = it },
+                        label = { Text("Current Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = newPasswordInput,
+                        onValueChange = { newPasswordInput = it },
+                        label = { Text("New Password (min 6 chars)") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = confirmPasswordInput,
+                        onValueChange = { confirmPasswordInput = it },
+                        label = { Text("Confirm New Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val currPass = currentPasswordAttempt.ifEmpty { password }
+                        if (newPasswordInput.length < 6) {
+                            rotationErrorMsg = "New password must be at least 6 characters."
+                            return@Button
+                        }
+                        if (newPasswordInput != confirmPasswordInput) {
+                            rotationErrorMsg = "New passwords do not match."
+                            return@Button
+                        }
+                        rotationErrorMsg = null
+                        authViewModel.updatePassword(expiredState.user.username, currPass, newPasswordInput)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = BentoPrimary),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Update & Login")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { authViewModel.resetState() }) {
+                    Text("Cancel", color = BentoTextSecondary)
+                }
+            },
+            containerColor = BentoSurface,
+            shape = RoundedCornerShape(24.dp)
+        )
     }
 }
 

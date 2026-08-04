@@ -1,5 +1,5 @@
 {
-  "name": "PRMS Medical",
+  "name": "Health Ledger",
   "description": "Patient Record Management System with SQLCipher Encryption, Biometrics, and Role-Based Access Control",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -72,7 +72,7 @@ class PrmsRepository private constructor(
                     actorUsername = "SYSTEM",
                     actorRole = UserRole.ADMIN,
                     actionType = "SYSTEM_INIT",
-                    details = "SQLCipher encrypted database initialized with seed RBAC accounts & Salted Hashes."
+                    details = "Room database initialized with seed RBAC accounts & Salted Hashes."
                 )
             )
         }
@@ -198,20 +198,50 @@ class PrmsRepository private constructor(
         }
     }
 
-    suspend fun authenticateWithBiometrics(username: String): Result<User> = withContext(Dispatchers.IO) {
+    suspend fun updatePassword(username: String, currentPassword: String, newPassword: String): Result<User> = withContext(Dispatchers.IO) {
         val user = userDao.getUserByUsername(username.trim())
-            ?: return@withContext Result.failure(Exception("User account not found for biometric login."))
+            ?: return@withContext Result.failure(Exception("User not found."))
 
-        securityManager.saveActiveSession(user.id, user.username, user.role.name)
+        val isValid = securityManager.verifyPassword(currentPassword, user.salt, user.passwordHash)
+        if (!isValid) {
+            return@withContext Result.failure(Exception("Current password is incorrect."))
+        }
+
+        if (newPassword.length < 6) {
+            return@withContext Result.failure(Exception("New password must be at least 6 characters long."))
+        }
+
+        if (currentPassword == newPassword) {
+            return@withContext Result.failure(Exception("New password cannot be the same as your old password."))
+        }
+
+        val newSalt = securityManager.generateSalt()
+        val newHash = securityManager.hashPassword(newPassword, newSalt)
+        val updatedUser = user.copy(
+            passwordHash = newHash,
+            salt = newSalt,
+            lastPasswordChange = System.currentTimeMillis()
+        )
+
+        userDao.updateUser(updatedUser)
+
         auditLogDao.insertAuditLog(
             AuditLog(
                 actorUsername = user.username,
                 actorRole = user.role,
-                actionType = "BIOMETRIC_AUTH_SUCCESS",
-                details = "User passed AndroidX Biometric verification. Logged into ${user.role.displayName}"
+                actionType = "PASSWORD_ROTATED_WEEKLY",
+                details = "User updated password under mandatory 7-day password rotation security policy."
             )
         )
-        Result.success(user)
+
+        Result.success(updatedUser)
+    }
+
+    suspend fun forceExpirePasswordForTesting(username: String): Result<Unit> = withContext(Dispatchers.IO) {
+        val user = userDao.getUserByUsername(username.trim()) ?: return@withContext Result.failure(Exception("User not found."))
+        val eightDaysAgo = System.currentTimeMillis() - (8L * 24 * 60 * 60 * 1000)
+        userDao.updateUser(user.copy(lastPasswordChange = eightDaysAgo))
+        Result.success(Unit)
     }
 
     suspend fun createUser(
@@ -350,8 +380,7 @@ class PrmsRepository private constructor(
         fun getInstance(context: Context): PrmsRepository {
             return INSTANCE ?: synchronized(this) {
                 val secManager = SecurityManager(context)
-                val passphrase = secManager.getOrGenerateDatabasePassphrase()
-                val database = AppDatabase.getDatabase(context, passphrase)
+                val database = AppDatabase.getDatabase(context)
                 val instance = PrmsRepository(database, secManager)
                 INSTANCE = instance
                 instance

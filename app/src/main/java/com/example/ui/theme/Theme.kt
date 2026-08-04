@@ -25,14 +25,14 @@ private val DarkColorScheme = darkColorScheme(
     primary = BentoAccentLight,
     secondary = BentoPrimary,
     tertiary = BentoSuccess,
-    background = Color(0xFF1D1B1E),
-    surface = Color(0xFF2B282F),
+    background = Color(0xFF161D12),
+    surface = Color(0xFF222B1E),
     onPrimary = BentoPrimaryDark,
     onSecondary = Color.White,
-    onBackground = Color(0xFFFDF8F6),
-    onSurface = Color(0xFFFDF8F6),
-    surfaceVariant = Color(0xFF36343B),
-    outline = Color(0xFF49454F)
+    onBackground = Color(0xFFF6F8F3),
+    onSurface = Color(0xFFF6F8F3),
+    surfaceVariant = Color(0xFF2E3B29),
+    outline = Color(0xFF43513C)
 )
 
 @Composable

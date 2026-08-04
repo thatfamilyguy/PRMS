@@ -1,14 +1,8 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <!-- Medical Shield Path -->
-    <path
-        android:fillColor="#0284C7"
-        android:pathData="M54,20 C68,20 80,25 80,25 C80,25 82,58 54,88 C26,58 28,25 28,25 C28,25 40,20 54,20 Z" />
-    <!-- White Medical Cross -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M50,38 h8 v12 h12 v8 h-12 v12 h-8 v-12 h-12 v-8 h12 Z" />
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="72dp"
+        android:height="72dp"
+        android:drawable="@drawable/health_ledger_emblem"
+        android:gravity="center" />
+</layer-list>

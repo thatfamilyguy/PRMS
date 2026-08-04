@@ -3,6 +3,7 @@ package com.example.ui.manager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -92,9 +93,11 @@ fun ManagerDashboardScreen(
                 }
             }
 
-            // Bento Stat Cards Grid
+            // Bento Stat Cards Grid (Scrollable horizontally)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 ManagerStatCard(
@@ -103,7 +106,7 @@ fun ManagerDashboardScreen(
                     icon = Icons.Default.People,
                     bgColor = BentoContainerPurple,
                     tintColor = BentoPrimary,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.width(180.dp)
                 )
                 ManagerStatCard(
                     title = "ICU Occupancy",
@@ -111,7 +114,7 @@ fun ManagerDashboardScreen(
                     icon = Icons.Default.AirlineSeatFlat,
                     bgColor = BentoAlert.copy(alpha = 0.1f),
                     tintColor = BentoAlert,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.width(180.dp)
                 )
                 ManagerStatCard(
                     title = "Vitals Alerts",
@@ -119,7 +122,7 @@ fun ManagerDashboardScreen(
                     icon = Icons.Default.Warning,
                     bgColor = BentoWarning.copy(alpha = 0.1f),
                     tintColor = BentoWarning,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.width(180.dp)
                 )
             }
 

@@ -37,5 +37,12 @@ data class User(
     val isActive: Boolean = true,
     
     @ColumnInfo(name = "biometric_enabled")
-    val biometricEnabled: Boolean = true
-)
+    val biometricEnabled: Boolean = false,
+
+    @ColumnInfo(name = "last_password_change")
+    val lastPasswordChange: Long = System.currentTimeMillis()
+) {
+    fun isPasswordExpired(expirationPeriodMs: Long = 7L * 24 * 60 * 60 * 1000): Boolean {
+        return (System.currentTimeMillis() - lastPasswordChange) >= expirationPeriodMs
+    }
+}

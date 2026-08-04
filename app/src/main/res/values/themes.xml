@@ -7,8 +7,8 @@
 
     <!-- High-Speed Splash Screen Theme (API 26+ compatible via androidx.core:core-splashscreen) -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#0F172A</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_placeholder</item>
+        <item name="windowSplashScreenBackground">#F6F8F3</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/health_ledger_emblem</item>
         <item name="postSplashScreenTheme">@style/Theme.PRMSMedical</item>
     </style>
 </resources>

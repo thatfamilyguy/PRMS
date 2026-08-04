@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "PRMS Medical"
+rootProject.name = "Health Ledger"
 
 include(":app")

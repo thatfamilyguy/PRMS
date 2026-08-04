@@ -89,7 +89,7 @@ dependencies {
   implementation(libs.androidx.core.splashscreen)
   implementation(libs.androidx.biometric)
   implementation(libs.androidx.security.crypto)
-  implementation(libs.sqlcipher.android)
+  // implementation(libs.sqlcipher.android)
   implementation(libs.mpandroidchart)
   implementation(libs.androidx.sqlite.ktx)
   // implementation(libs.androidx.datastore.preferences)
